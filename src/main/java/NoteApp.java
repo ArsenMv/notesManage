@@ -1,13 +1,18 @@
 import java.util.ArrayList;
 import java.util.Scanner;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 
 public class NoteApp {
     private ArrayList<Notes> notes;
     private Scanner sc;
+    private static final String FILE_NAME = "myFile.txt";
 
     public NoteApp() {
         notes = new ArrayList<>();
         sc = new Scanner(System.in);
+        loadNotes();
     }
 
     // Метод для добавления заметки
@@ -19,10 +24,16 @@ public class NoteApp {
 
         notes.add(new Notes(title, content));
         System.out.println("Заметка добавлена успешно!");
+        saveNotes();
     }
 
     // Метод для редактирования заметки
     public void editNote() {
+        if (notes.isEmpty()) {
+            System.out.println("Нет заметок, доступных для редактирования.");
+            return;
+        }
+
         System.out.println("Введите индекс заметки для редактирования (от 0 до " + (notes.size() - 1) + "): ");
         int index = Integer.parseInt(sc.nextLine());
 
@@ -44,6 +55,7 @@ public class NoteApp {
             }
 
             System.out.println("Заметка успешно обновлена!");
+            saveNotes();
         } else {
             System.out.println("Неверный индекс заметки.");
         }
@@ -51,12 +63,18 @@ public class NoteApp {
 
     // Метод для удаления заметки
     public void deleteNote() {
+        if (notes.isEmpty()) {
+            System.out.println("Нет заметок, доступных для удаления.");
+            return;
+        }
+
         System.out.println("Введите индекс заметки, которую нужно удалить (от 0 до " + (notes.size() - 1) + ") : ");
         int index = Integer.parseInt(sc.nextLine());
 
         if (index >= 0 && index < notes.size()) {
             notes.remove(index);
             System.out.println("Заметка успешно удалена!");
+            saveNotes();
         } else {
             System.out.println("Неверный индекс заметки.");
         }
@@ -75,13 +93,42 @@ public class NoteApp {
         }
     }
 
+    // Метод для сохранения заметок в файл
+    public void saveNotes() {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(FILE_NAME))) {
+            for (Notes note : notes) {
+                writer.write(note.getTitle() + "\n");
+                writer.write(note.getContent() + "\n");
+                writer.write("---\n");
+            }
+            System.out.println("Заметки сохранены в файл.");
+        } catch (Exception e) {
+            System.out.println("Заметки о сохранении ошибок: " + e.getMessage());
+        }
+    }
+
+    // Метод для загрузки заметок из файла
+    public void loadNotes() {
+        try (Scanner fileScanner = new Scanner(new java.io.File(FILE_NAME))) {
+            while (fileScanner.hasNextLine()) {
+                String title = fileScanner.nextLine();
+                String content = fileScanner.nextLine();
+                fileScanner.nextLine(); // Пропускаем разделитель "---"
+
+                notes.add(new Notes(title, content));
+            }
+        } catch (IOException e) {
+            System.out.println("Примечания по загрузке ошибок: " + e.getMessage());
+        }
+    }
+
     // Главное меню
     public void showMenu() {
         while (true) {
             System.out.println("1. Добавить заметку");
             System.out.println("2. Редактировать заметку");
             System.out.println("3. Удалить заметку");
-            System.out.println("4. Все заметки");
+            System.out.println("4. Просмотр всех заметок");
             System.out.println("5. Выход");
             System.out.print("Выберите вариант: ");
             int option = Integer.parseInt(sc.nextLine());
@@ -101,6 +148,7 @@ public class NoteApp {
                     break;
                 case 5:
                     System.out.println("Выхожу...");
+                    saveNotes();
                     return;
                 default:
                     System.out.println("Неверный вариант, пожалуйста, попробуйте еще раз.");
