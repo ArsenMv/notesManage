@@ -34,30 +34,41 @@ public class NoteApp {
             return;
         }
 
-        System.out.println("Введите индекс заметки для редактирования (от 0 до " + (notes.size() - 1) + "): ");
-        int index = Integer.parseInt(sc.nextLine());
 
-        if (index >= 0 && index < notes.size()) {
-            Notes note = notes.get(index);
-            System.out.println("Редактирование заметки: ");
-            System.out.println(note);
+        int index = -1;
+        boolean validInput = false;
 
-            System.out.println("Введите новое название (оставьте пустым, чтобы сохранить актуальность): ");
-            String newTitle = sc.nextLine();
-            if (!newTitle.isEmpty()) {
-                note.setTitle(newTitle);
+        while (!validInput) {
+            System.out.println("Введите индекс заметки для редактирования (от 0 до " + (notes.size() - 1) + "): ");
+            try {
+                index = Integer.parseInt(sc.nextLine());
+
+                if (index >= 0 && index < notes.size()) {
+                    Notes note = notes.get(index);
+                    System.out.println("Редактирование заметки: ");
+                    System.out.println(note);
+
+                    System.out.println("Введите новое название (оставьте пустым, чтобы сохранить актуальность): ");
+                    String newTitle = sc.nextLine();
+                    if (!newTitle.isEmpty()) {
+                        note.setTitle(newTitle);
+                    }
+
+                    System.out.println("Введите новый контент (оставьте поле пустым, чтобы поддерживать актуальность): ");
+                    String newContent = sc.nextLine();
+                    if (!newContent.isEmpty()) {
+                        note.setContent(newContent);
+                    }
+
+                    System.out.println("Заметка успешно обновлена!");
+                    validInput = true;
+                    saveNotes();
+                } else {
+                    System.out.println("Неверный индекс заметки.");
+                }
+            } catch (NumberFormatException e) {
+                System.out.println("Некорректный ввод, введите целое число.");
             }
-
-            System.out.println("Введите новый контент (оставьте поле пустым, чтобы поддерживать актуальность): ");
-            String newContent = sc.nextLine();
-            if (!newContent.isEmpty()) {
-                note.setContent(newContent);
-            }
-
-            System.out.println("Заметка успешно обновлена!");
-            saveNotes();
-        } else {
-            System.out.println("Неверный индекс заметки.");
         }
     }
 
@@ -68,15 +79,25 @@ public class NoteApp {
             return;
         }
 
-        System.out.println("Введите индекс заметки, которую нужно удалить (от 0 до " + (notes.size() - 1) + ") : ");
-        int index = Integer.parseInt(sc.nextLine());
+        int index = -1;
+        boolean validInput = false;
 
-        if (index >= 0 && index < notes.size()) {
-            notes.remove(index);
-            System.out.println("Заметка успешно удалена!");
-            saveNotes();
-        } else {
-            System.out.println("Неверный индекс заметки.");
+        while (!validInput) {
+            System.out.println("Введите индекс заметки, которую нужно удалить (от 0 до " + (notes.size() - 1) + ") : ");
+            try {
+                index = Integer.parseInt(sc.nextLine());
+
+                if (index >= 0 && index < notes.size()) {
+                    notes.remove(index);
+                    System.out.println("Заметка успешно удалена!");
+                    saveNotes();
+                    validInput = true;
+                } else {
+                    System.out.println("Неверный индекс заметки.");
+                }
+            } catch (NumberFormatException e) {
+                System.out.println("Некорреткный ввод, введите челое число.");
+            }
         }
     }
 
@@ -129,7 +150,7 @@ public class NoteApp {
             System.out.println("2. Редактировать заметку");
             System.out.println("3. Удалить заметку");
             System.out.println("4. Просмотр всех заметок");
-            System.out.println("5. Выход");
+            System.out.println("5. Сохранить и выйти");
             System.out.print("Выберите вариант: ");
             int option = Integer.parseInt(sc.nextLine());
 
